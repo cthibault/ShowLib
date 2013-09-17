@@ -1,0 +1,16 @@
+﻿<mui:ModernWindow x:Class="ShowLib.Client.WPF.View.Shell"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                  ContentSource="view/ShowsPage.xaml"
+                  Title="Shell" Height="300" Width="300">
+    
+    <mui:ModernWindow.MenuLinkGroups>
+        <mui:LinkGroup DisplayName="Name Resolver">
+            <mui:LinkGroup.Links>
+                <mui:Link DisplayName="Shows" Source="view/ShowsPage.xaml" />
+                <mui:Link DisplayName="Parsers" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+    </mui:ModernWindow.MenuLinkGroups>
+</mui:ModernWindow>
