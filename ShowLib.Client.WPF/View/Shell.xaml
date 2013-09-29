@@ -3,8 +3,8 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   ContentSource="view/ShowsPage.xaml"
-                  Title="Shell" Height="300" Width="300">
-    
+                  Title="Shell" Height="622" Width="752">
+
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup DisplayName="Name Resolver">
             <mui:LinkGroup.Links>

@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ReactiveUI;
 
 namespace ShowLib.Client.WPF
 {
@@ -13,5 +14,9 @@ namespace ShowLib.Client.WPF
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            //RxApp
+        }
     }
 }

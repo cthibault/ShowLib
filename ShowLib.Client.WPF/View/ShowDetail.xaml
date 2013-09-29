@@ -6,6 +6,40 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid Style="{StaticResource ContentRoot}">
-        <TextBlock Text="Show Detail" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <GroupBox Grid.Row="0" Header="General Information">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" Margin="5" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveShow.Title}" Margin="2,2" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Directory" Margin="5" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveShow.ShowDetail.Directory}" Margin="2,2" />
+                <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{Binding BrowseDirectoryCommand}" Margin="5,2" Padding="5,2" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Tvdb ID" Margin="5" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ActiveShow.ShowDetail.TvdbId, Mode=OneWay}" IsReadOnly="True" Margin="2,2" />
+                <Button Grid.Row="2" Grid.Column="2" Content="..." Command="{Binding SearchTvdbCommand}" Margin="5,2" Padding="5,2" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Imdb ID" Margin="5" />
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ActiveShow.ShowDetail.ImdbId, Mode=OneWay}" IsReadOnly="True" Margin="2,2" />
+            </Grid>
+        </GroupBox>
     </Grid>
 </UserControl>

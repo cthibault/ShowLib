@@ -8,6 +8,16 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <Grid Style="{StaticResource ContentRoot}">
-        <mui:ModernTab Layout="List" Links="{Binding Links}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,5">
+            <Button Content="Add" Command="{Binding AddNewShowCommand}" />
+            <Button Content="Delete" Margin="3,0" Command="{Binding DeleteShowCommand}" />
+        </StackPanel>
+        
+        <mui:ModernTab Grid.Row="1" Layout="List" Links="{Binding Links}" />
     </Grid>
 </UserControl>

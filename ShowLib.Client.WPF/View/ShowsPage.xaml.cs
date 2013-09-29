@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FirstFloor.ModernUI.Windows;
 using ShowLib.Client.WPF.ViewModel;
+using ShowLib.Data.Repositories;
 
 namespace ShowLib.Client.WPF.View
 {
@@ -56,7 +57,9 @@ namespace ShowLib.Client.WPF.View
             {
                 if (this._viewModel == null)
                 {
-                    this._viewModel = new ShowsViewModel();
+                    //var context = new MockShowLibContext("");
+                    var context = new ShowLibContext(null);
+                    this._viewModel = new ShowsViewModel(context);
                     this.DataContext = this._viewModel;
                 }
                 return this._viewModel;

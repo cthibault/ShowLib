@@ -36,7 +36,7 @@ namespace ShowLib.Client.WPF.View
                 int showId = 0;
                 if (int.TryParse(e.Fragment, out showId))
                 {
-                    vm.GetShowDetails(showId);
+                    vm.SelectShow(showId);
                 }
             }
         }
