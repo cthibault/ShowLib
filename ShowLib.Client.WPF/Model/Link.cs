@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FirstFloor.ModernUI.Presentation;
 
 namespace ShowLib.Client.WPF.Model
 {
-    public class LinkWithItem<T> : Link
+    public class Link<T> : Link
     {
         private T _item;
         public T Item
@@ -15,7 +14,7 @@ namespace ShowLib.Client.WPF.Model
             get { return this._item; }
             set
             {
-                if (!this._item.Equals(value))
+                if (this._item == null || !this._item.Equals(value))
                 {
                     this._item = value;
                     this.OnPropertyChanged("Item");

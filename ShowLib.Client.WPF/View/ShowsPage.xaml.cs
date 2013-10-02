@@ -57,9 +57,9 @@ namespace ShowLib.Client.WPF.View
             {
                 if (this._viewModel == null)
                 {
-                    //var context = new MockShowLibContext("");
                     var context = new ShowLibContext(null);
                     this._viewModel = new ShowsViewModel(context);
+
                     this.DataContext = this._viewModel;
                 }
                 return this._viewModel;

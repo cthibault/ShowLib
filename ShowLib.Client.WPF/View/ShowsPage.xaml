@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d" 
+             x:Name="Page"
              d:DesignHeight="300" d:DesignWidth="300">
 
     <Grid Style="{StaticResource ContentRoot}">
@@ -14,10 +16,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="0,5">
-            <Button Content="Add" Command="{Binding AddNewShowCommand}" />
-            <Button Content="Delete" Margin="3,0" Command="{Binding DeleteShowCommand}" />
+            <Button Content="add" Command="{Binding AddNewShowCommand}" />
+            <Button Content="delete" Margin="3,0,0,0" Command="{Binding DeleteShowCommand}" />
+            <Button Content="refresh" Margin="3,0,0,0" Command="{Binding RefreshShowsCommand}" />
         </StackPanel>
-        
-        <mui:ModernTab Grid.Row="1" Layout="List" Links="{Binding Links}" />
+
+        <mui:ModernTab x:Name="moderntab" Grid.Row="1" Layout="List" Links="{Binding ShowLinks}" SelectedSource="{Binding SelectedSource}" />
     </Grid>
 </UserControl>

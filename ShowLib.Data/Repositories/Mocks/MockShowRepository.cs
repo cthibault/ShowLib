@@ -69,6 +69,10 @@ namespace ShowLib.Data.Repositories
         {
             throw new NotImplementedException();
         }
+        public Task<Show> Load(Show entity)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<KeyValuePair<bool, IList<Show>>> Save(Show entity)
         {

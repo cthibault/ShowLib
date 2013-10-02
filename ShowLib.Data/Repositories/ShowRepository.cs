@@ -13,14 +13,21 @@ namespace ShowLib.Data.Repositories
     {
         internal ShowRepository(DocumentStore documentStore) : base(documentStore) { }
 
-        public override async Task<KeyValuePair<bool, IList<Show>>> Save(IEnumerable<Show> entities)
+        public override async Task<IList<Show>> LoadAll()
         {
-            foreach (var entity in entities.Where(s => s.Id < 0))
+            var results = await base.LoadAll();
+
+            return results.OrderBy(s => s.Title).ToList();
+        }
+
+        public async Task<Show> Load(Show entity)
+        {
+            if (entity != null)
             {
-                entity.Id = 0;
+                entity = await this.Load(entity.Id);
             }
 
-            return await base.Save(entities);
+            return entity;
         }
     }
 }

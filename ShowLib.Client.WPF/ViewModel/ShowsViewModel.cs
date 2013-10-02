@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using FirstFloor.ModernUI.Presentation;
 using FirstFloor.ModernUI.Windows.Controls;
 using ReactiveUI;
 using ShowLib.Client.WPF.Model;
+using ShowLib.Client.WPF.View;
 using ShowLib.Data.Entities;
 using ShowLib.Data.Repositories;
 
@@ -47,9 +47,15 @@ namespace ShowLib.Client.WPF.ViewModel
 
             if (showId > 0)
             {
-                show = this.Shows.Single(s => s.Id == showId);
+                var showLink = this.ShowLinks.OfType<ShowLink>().SingleOrDefault(sl => sl.Item.Id == showId);
 
-                show = await this.Context.ShowRepository.Load(show.Id);
+                if (showLink != null)
+                {
+                    show = await this.Context.ShowRepository.Load(showLink.Item);
+                    showLink.PopulateWith(show);
+
+                    this.SelectedSource = showLink.Source;
+                }
             }
 
             this.ActiveShow = show;
@@ -61,10 +67,10 @@ namespace ShowLib.Client.WPF.ViewModel
 
         private void InitializeCommands()
         {
-            this.BrowseDirectoryCommand = new ReactiveCommand();
+            this.BrowseDirectoryCommand = new ReactiveCommand(this.WhenAny(vm => vm.ActiveShow, x => x.Value != null && x.Value.ShowDetail != null));
             this.BrowseDirectoryCommand.Subscribe(x => this.OnBrowseDirectory());
 
-            this.SearchTvdbCommand = new ReactiveCommand();
+            this.SearchTvdbCommand = new ReactiveCommand(this.WhenAny(vm => vm.ActiveShow, x => x.Value != null));
             this.SearchTvdbCommand.Subscribe(x => this.OnSearchTvdb());
 
             this.AddNewShowCommand = new ReactiveCommand();
@@ -72,34 +78,68 @@ namespace ShowLib.Client.WPF.ViewModel
 
             this.DeleteShowCommand = new ReactiveCommand(this.WhenAny(vm => vm.ActiveShow, x => x.Value != null));
             this.DeleteShowCommand.Subscribe(x => this.OnDeleteShow());
+
+            this.RefreshShowsCommand = new ReactiveCommand();
+            this.RefreshShowsCommand.Subscribe(x => this.OnRefreshShows());
         }
 
         private void AddShow(Show show)
         {
             if (show != null)
             {
-                if (!this.Shows.Any(s => s.Id == show.Id))
+                if (!this.ShowLinks.OfType<ShowLink>().Any(sl => sl.Item.Id == show.Id))
                 {
-                    this.Shows.Add(show);
-                    this.Links.Add(new Link
-                    {
-                        DisplayName = show.Title, 
-                        Source = new Uri("/view/ShowDetail.xaml#" + show.Id, UriKind.Relative) 
-                    });
+                    var showLink = new ShowLink(show);
+
+                    this.ShowLinks.Add(showLink);
                 }
             }
         }
+
         private void RemoveShow(Show show)
         {
             if (show != null)
             {
+                var showLink = this.ShowLinks.OfType<ShowLink>().SingleOrDefault(sl => sl.Item.Id == show.Id);
 
+                if (showLink != null)
+                {
+                    this.ShowLinks.Remove(showLink);
+
+                    this.SelectedSource = null;
+
+                    var newSelectedLink = this.ShowLinks.FirstOrDefault();
+                    if (newSelectedLink != null)
+                    {
+                        this.SelectedSource = newSelectedLink.Source;
+                    }
+                }
             }
         }
 
+        private void SaveCurrent()
+        {
+            if (this.ActiveShow != null)
+            {
+                this.Context.ShowRepository.Save(this.ActiveShow);
+            }
+        }
+
+        #endregion
+
+        #region Commands
+
+        public ReactiveCommand AddNewShowCommand { get; set; }
+        public ReactiveCommand DeleteShowCommand { get; set; }
+        public ReactiveCommand RefreshShowsCommand { get; set; }
+        public ReactiveCommand BrowseDirectoryCommand { get; set; }
+        public ReactiveCommand SearchTvdbCommand { get; set; }
+
+        #region Command Handlers
+
         private async Task OnAddNewShow()
         {
-            var show = new Show 
+            var show = new Show
             {
                 Title = "New Show",
                 ShowDetail = new ShowDetail()
@@ -109,8 +149,6 @@ namespace ShowLib.Client.WPF.ViewModel
 
             this.AddShow(show);
 
-            this.SaveCurrent();
-
             this.SelectShow(show.Id);
         }
 
@@ -118,11 +156,7 @@ namespace ShowLib.Client.WPF.ViewModel
         {
             if (this.ActiveShow != null)
             {
-                MessageBoxButton buttons = MessageBoxButton.YesNo;
-
-                string message = string.Format("Are you sure you want to delete '{0}'?", this.ActiveShow.Title);
-
-                var result = ModernDialog.ShowMessage(message, "Delete Show", buttons);
+                var result = ModernDialog.ShowMessage(string.Format("Are you sure you want to delete '{0}'?", this.ActiveShow.Title), "Delete Show", MessageBoxButton.YesNo);
 
                 if (result == MessageBoxResult.Yes)
                 {
@@ -140,11 +174,22 @@ namespace ShowLib.Client.WPF.ViewModel
             }
         }
 
-        private void SaveCurrent()
+        private async Task OnRefreshShows()
         {
-            if (this.ActiveShow != null)
+            this.SaveCurrent();
+
+            var currentShow = this.ActiveShow;
+
+            this.ActiveShow = null;
+            this.SelectedSource = null;
+
+            this.ShowLinks.Clear();
+
+            await this.GetShows();
+
+            if (currentShow != null)
             {
-                this.Context.ShowRepository.Save(this.ActiveShow);
+                this.SelectShow(currentShow.Id);
             }
         }
 
@@ -152,7 +197,7 @@ namespace ShowLib.Client.WPF.ViewModel
         {
             if (this.ActiveShow != null && this.ActiveShow.ShowDetail != null)
             {
-                var dialog = new FolderBrowserDialog
+                var dialog = new System.Windows.Forms.FolderBrowserDialog
                 {
                     ShowNewFolderButton = true,
                     Description = "Select Series Directory",
@@ -171,43 +216,63 @@ namespace ShowLib.Client.WPF.ViewModel
 
         private void OnSearchTvdb()
         {
+            var searchTvdbDialog = new ModernDialog() { Title = "Search Tvdb" };
 
+            var tvdbSearchControl = new TvdbSearchControl();
+            searchTvdbDialog.Content = tvdbSearchControl;
+
+            var okButton = searchTvdbDialog.OkButton;
+            var okButtonCommand = new ReactiveCommand(tvdbSearchControl.ViewModel.WhenAny(vm => vm.SelectedSearchResult, x => x.Value != null));
+            okButtonCommand.Subscribe(x => searchTvdbDialog.CloseCommand.Execute(x));
+            okButton.Command = okButtonCommand;
+            okButton.IsDefault = false;            
+
+            searchTvdbDialog.Buttons = new System.Windows.Controls.Button[] { okButton, searchTvdbDialog.CancelButton };
+
+            var result = searchTvdbDialog.ShowDialog2();
+
+            if (result == MessageBoxResult.OK)
+            {
+                var selectedResult = tvdbSearchControl.ViewModel.SelectedSearchResult;
+                if (selectedResult != null)
+                {
+                    if (this.ActiveShow.ShowDetail == null)
+                    {
+                        this.ActiveShow.ShowDetail = new ShowDetail();
+                    }
+
+                    if (this.ActiveShow.Title != selectedResult.Title)
+                    {
+                        var message = string.Format("Do you want to update the Title based on the Selected Result?\n\n'{0}' -> '{1}'", this.ActiveShow.Title, selectedResult.Title);
+
+                        result = ModernDialog.ShowMessage(message, "Update Title", MessageBoxButton.YesNo);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            this.ActiveShow.Title = selectedResult.Title;
+                        }
+                    }
+
+                    this.ActiveShow.ShowDetail.TvdbId = selectedResult.TvdbId;
+                    this.ActiveShow.ShowDetail.ImdbId = selectedResult.ImdbId;
+                }
+            }
         }
 
         #endregion
-
-        #region Commands
-
-        public ReactiveCommand BrowseDirectoryCommand { get; set; }
-        public ReactiveCommand SearchTvdbCommand { get; set; }
-        public ReactiveCommand AddNewShowCommand { get; set; }
-        public ReactiveCommand DeleteShowCommand { get; set; }
 
         #endregion
 
         #region Public Properties
 
-        public LinkCollection Links
+        public LinkCollection ShowLinks
         {
             get
             {
-                if (this._links == null)
+                if (this._showLinks == null)
                 {
-                    this._links = new LinkCollection();
+                    this._showLinks = new LinkCollection();
                 }
-                return this._links;
-            }
-        }
-
-        public ObservableCollection<Show> Shows
-        {
-            get
-            {
-                if (this._shows == null)
-                {
-                    this._shows = new ObservableCollection<Show>();
-                }
-                return this._shows;
+                return this._showLinks;
             }
         }
 
@@ -215,6 +280,12 @@ namespace ShowLib.Client.WPF.ViewModel
         {
             get { return this._activeShow; }
             set { this.RaiseAndSetIfChanged(ref this._activeShow, value); }
+        }
+
+        public Uri SelectedSource 
+        {
+            get { return _selectedSource; }
+            set { this.RaiseAndSetIfChanged(ref _selectedSource, value); }
         }
 
         #endregion
@@ -225,8 +296,8 @@ namespace ShowLib.Client.WPF.ViewModel
 
         #region Private Fields
         private IShowRepository _showRepository;
-        private LinkCollection _links;
-        private ObservableCollection<Show> _shows;
+        private LinkCollection _showLinks;
+        private Uri _selectedSource;        
         private Show _activeShow;
         #endregion
     }

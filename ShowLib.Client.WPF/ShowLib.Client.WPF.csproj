@@ -34,8 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FirstFloor.ModernUI">
-      <HintPath>..\packages\ModernUI.WPF.1.0.5\lib\net45\FirstFloor.ModernUI.dll</HintPath>
+    <Reference Include="FirstFloor.ModernUI, Version=1.0.5.0, Culture=neutral, PublicKeyToken=2d21ec3cd074c59a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\FirstFloor.ModernUI.dll</HintPath>
     </Reference>
     <Reference Include="ReactiveUI">
       <HintPath>..\packages\reactiveui-core.5.1.2\lib\Portable-Net45+WinRT45+WP8\ReactiveUI.dll</HintPath>
@@ -85,17 +86,22 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Model\LinkWithItem.cs" />
+    <Compile Include="Model\ShowLink.cs" />
+    <Compile Include="Model\ShowLinkCollection.cs" />
+    <Compile Include="ViewModel\TvdbSearchViewModel.cs" />
     <Compile Include="ViewModel\Interface\IPageViewModel.cs" />
     <Compile Include="ViewModel\ShowsViewModel.cs" />
-    <Compile Include="View\ShowDetail.xaml.cs">
-      <DependentUpon>ShowDetail.xaml</DependentUpon>
+    <Compile Include="View\ShowDetailPage.xaml.cs">
+      <DependentUpon>ShowDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ShowsPage.xaml.cs">
       <DependentUpon>ShowsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TvdbSearch.xaml.cs">
+      <DependentUpon>TvdbSearch.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -126,9 +132,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Page Include="View\ShowDetail.xaml">
+    <Folder Include="Behaviors\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="View\ShowDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -137,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Shell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TvdbSearch.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

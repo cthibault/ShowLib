@@ -150,14 +150,17 @@ namespace ShowLib.Data.Repositories
                     {
                         var entities = await session.LoadAsync<T>(ids);
 
-                        foreach (var entity in entities)
+                        if (entities != null)
                         {
-                            session.Delete<T>(entity);
+                            foreach (var entity in entities)
+                            {
+                                session.Delete<T>(entity);
+                            }
+
+                            await session.SaveChangesAsync();
+
+                            success = true;
                         }
-
-                        await session.SaveChangesAsync();
-
-                        success = true;
                     }
                     catch (Exception ex)
                     {

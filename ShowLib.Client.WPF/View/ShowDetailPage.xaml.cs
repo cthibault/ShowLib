@@ -20,9 +20,9 @@ namespace ShowLib.Client.WPF.View
     /// <summary>
     /// Interaction logic for ShowDetail.xaml
     /// </summary>
-    public partial class ShowDetail : UserControl, IContent
+    public partial class ShowDetailPage : UserControl, IContent
     {
-        public ShowDetail()
+        public ShowDetailPage()
         {
             InitializeComponent();
         }

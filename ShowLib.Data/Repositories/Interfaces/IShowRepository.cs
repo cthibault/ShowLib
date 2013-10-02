@@ -9,5 +9,6 @@ namespace ShowLib.Data.Repositories
 {
     public interface IShowRepository : IRepository<Show>
     {
+        Task<Show> Load(Show entity);
     }
 }

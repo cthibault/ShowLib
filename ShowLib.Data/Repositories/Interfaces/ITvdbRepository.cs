@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using ShowLib.Data.Entities;
 
 namespace ShowLib.Data.Repositories
 {
     public interface ITvdbRepository
     {
-        IEnumerable<TvdbSearchResult> SearchSeries(string seriesName);
+        Task<IEnumerable<TvdbSearchResult>> SearchSeries(string seriesName);
 
-        EpisodeData GetEpisodeInfo(int seriesId, int seasonNumber, int episodeNumber);
+        Task<EpisodeData> GetEpisodeInfo(int seriesId, int seasonNumber, int episodeNumber);
     }
 }
